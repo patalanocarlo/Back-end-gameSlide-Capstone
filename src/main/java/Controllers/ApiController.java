@@ -1,12 +1,13 @@
 package Controllers;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-@Controller
+@RestController
 public class ApiController {
 
     @Value("${api.key}")
@@ -14,6 +15,7 @@ public class ApiController {
 
     @Value("${api.url}")
     private String apiUrl;
+
     @GetMapping("/games")
     public String getGames(
             @RequestParam String genre,
@@ -21,7 +23,11 @@ public class ApiController {
         String url = String.format("%s?key=%s&page_size=8&genres=%s&dates=%d-01-01,%d-12-31",
                 apiUrl, apiKey, genre, year, year);
         RestTemplate restTemplate = new RestTemplate();
-        return restTemplate.getForObject(url, String.class);
+        try {
+            return restTemplate.getForObject(url, String.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Errore nel caricamento dei dati";
+        }
     }
-
 }
